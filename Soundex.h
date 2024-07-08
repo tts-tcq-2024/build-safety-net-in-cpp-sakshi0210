@@ -4,5 +4,6 @@
 #include <string>
 
 std::string generateSoundex(const std::string& name);
+char getSoundexCode(char c);
 
 #endif // SOUNDEX_H
