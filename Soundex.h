@@ -5,5 +5,7 @@
 
 std::string generateSoundex(const std::string& name);
 char getSoundexCode(char c);
+bool isVowelOrIgnored(char c);
 
 #endif // SOUNDEX_H
+
