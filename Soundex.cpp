@@ -1,71 +1,75 @@
-##include "Soundex.h"
+#include "Soundex.h"
+#include <cstddef>
 #include <unordered_map>
-#include <cctype>
 
-// Function to get the soundex code for a given character
-char get_soundex_code(char c) {
-    c = std::toupper(c);
-    static std::unordered_map<char, char> mapping = {
-        {'B', '1'}, {'F', '1'}, {'P', '1'}, {'V', '1'},
-        {'C', '2'}, {'G', '2'}, {'J', '2'}, {'K', '2'},
-        {'Q', '2'}, {'S', '2'}, {'X', '2'}, {'Z', '2'},
-        {'D', '3'}, {'T', '3'},
-        {'L', '4'},
-        {'M', '5'}, {'N', '5'},
-        {'R', '6'}
+const std::string Soundex::NotADigit = "*";
+const size_t MaxCodeLength = 4;
+
+std::string Soundex::encode(const std::string& word) const {
+    return zeroPad(head(word) + tail(encodedDigits(word)));
+}
+
+std::string Soundex::head(const std::string& word) const {
+    return word.substr(0, 1);
+}
+
+std::string Soundex::tail(const std::string& word) const {
+    return word.substr(1);
+}
+
+std::string Soundex::encodedDigits(const std::string& word) const {
+    std::string encoding;
+    encodeHead(encoding, word);
+    encodeTail(encoding, word);
+    return encoding;
+}
+
+void Soundex::encodeHead(std::string& encoding, const std::string& word) const {
+    encoding += encodedDigit(word.front());
+}
+
+void Soundex::encodeTail(std::string& encoding, const std::string& word) const {
+    for (auto i = 1u; i < word.length(); i++) {
+        if (!isComplete(encoding)) {
+            encodeLetter(encoding, word[i], word[i-1]);
+        }
+    }
+}
+
+void Soundex::encodeLetter(std::string& encoding, char letter, char lastLetter) const {
+    auto digit = encodedDigit(letter);
+    if (digit != NotADigit && (digit != lastDigit(encoding) || isVowel(lastLetter))) {
+        encoding += digit;
+    }
+}
+
+std::string Soundex::encodedDigit(char letter) const {
+    const static std::unordered_map<char, std::string> encodings {
+        {'b', "1"}, {'f', "1"}, {'p', "1"}, {'v', "1"},
+        {'c', "2"}, {'g', "2"}, {'j', "2"}, {'k', "2"}, {'q', "2"}, {'s', "2"}, {'x', "2"}, {'z', "2"},
+        {'d', "3"}, {'t', "3"},
+        {'l', "4"},
+        {'m', "5"}, {'n', "5"},
+        {'r', "6"}
     };
-
-    auto it = mapping.find(c);
-    if (it != mapping.end()) {
-        return it->second;
-    }
-    return '0'; // Default to '0' for non-mapped characters
+    auto it = encodings.find(letter);
+    return it == encodings.end() ? NotADigit : it->second;
 }
 
-// Function to compare characters and return the soundex code if conditions are met
-std::string comparison(char ch, char prev_code) {
-    if (ch != '0' && ch != prev_code) {
-        return std::string(1, ch);
-    } else {
-        return "";
-    }
+std::string Soundex::zeroPad(const std::string& word) const {
+    auto zerosNeeded = MaxCodeLength - word.length();
+    return word + std::string(zerosNeeded, '0');
 }
 
-// Function to map the rest of the name to soundex codes
-std::string num_map(const std::string& name, char& prev_code) {
-    std::string soundex = "";
-
-    for (size_t i = 1; i < name.length(); ++i) {
-        char ch = get_soundex_code(name[i]);
-        std::string code = comparison(ch, prev_code);
-
-        if (!code.empty()) {
-            soundex += code;
-            prev_code = ch;
-        }
-    }
-    return soundex;
+bool Soundex::isComplete(const std::string& encoding) const {
+    return encoding.length() == MaxCodeLength;
 }
 
-// Function to generate the soundex code for a given name
-std::string generate_soundex(const std::string& name) {
-    if (name.empty()) {
-        return "";
-    } else {
-        std::string soundex(1, std::toupper(name[0]));
-        char prev_code = get_soundex_code(soundex[0]);
+std::string Soundex::lastDigit(const std::string& encoding) const {
+    if (encoding.empty()) return NotADigit;
+    return std::string(1, encoding.back());
+}
 
-        soundex += num_map(name, prev_code);
-
-        if (soundex.length() > 4) {
-            soundex = soundex.substr(0, 4);
-        }
-
-        // Pad with zeros if necessary
-        while (soundex.length() < 4) {
-            soundex += '0';
-        }
-
-        return soundex;
-    }
+bool Soundex::isVowel(char letter) const {
+    return std::string("aeiouy").find(letter) != std::string::npos;
 }
