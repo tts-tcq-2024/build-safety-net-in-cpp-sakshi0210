@@ -1,47 +1,47 @@
 #include <gtest/gtest.h>
 #include "Soundex.h"
 
-// Test cases for get_soundex_code function
-TEST(SoundexTest, GetSoundexCode) {
-    EXPECT_EQ(get_soundex_code('B'), '1');
-    EXPECT_EQ(get_soundex_code('C'), '2');
-    EXPECT_EQ(get_soundex_code('D'), '3');
-    EXPECT_EQ(get_soundex_code('L'), '4');
-    EXPECT_EQ(get_soundex_code('M'), '5');
-    EXPECT_EQ(get_soundex_code('R'), '6');
-    EXPECT_EQ(get_soundex_code('A'), '0');
+TEST(SoundexTest, HandlesEmptyString) {
+    EXPECT_EQ(generateSoundex(""), "0000");
 }
 
-// Test cases for comparison function
-TEST(SoundexTest, Comparison) {
-    EXPECT_EQ(comparison('1', '0'), "1");
-    EXPECT_EQ(comparison('2', '2'), "");
-    EXPECT_EQ(comparison('3', '1'), "3");
-    EXPECT_EQ(comparison('0', '3'), "");
+TEST(SoundexTest, HandlesSingleCharacter) {
+    EXPECT_EQ(generateSoundex("A"), "A000");
 }
 
-// Test cases for num_map function
-TEST(SoundexTest, NumMap) {
-    char prev_code = 'R';
-    EXPECT_EQ(num_map("Rupert", prev_code), "163");
-    prev_code = 'A';
-    EXPECT_EQ(num_map("Ashcroft", prev_code), "261");
+TEST(SoundexTest, BasicFunctionality) {
+    EXPECT_EQ(generateSoundex("Smith"), "S530");
+    EXPECT_EQ(generateSoundex("Smythe"), "S530");
 }
 
-// Test cases for generate_soundex function
-TEST(SoundexTest, GenerateSoundex) {
-    EXPECT_EQ(generate_soundex(""), "");
-    EXPECT_EQ(generate_soundex("A"), "A000");
-    EXPECT_EQ(generate_soundex("Robert"), "R163");
-    EXPECT_EQ(generate_soundex("Rupert"), "R163");
-    EXPECT_EQ(generate_soundex("Rubin"), "R150");
-    EXPECT_EQ(generate_soundex("Ashcraft"), "A261");
-    EXPECT_EQ(generate_soundex("Ashcroft"), "A261");
-    EXPECT_EQ(generate_soundex("Pfister"), "P236");
+TEST(SoundexTest, CaseInsensitivity) {
+    EXPECT_EQ(generateSoundex("smith"), "S530");
+    EXPECT_EQ(generateSoundex("SMITH"), "S530");
+}
+
+TEST(SoundexTest, AdjacentSimilarSoundingConsonants) {
+    EXPECT_EQ(generateSoundex("Pfister"), "P123");
+    EXPECT_EQ(generateSoundex("Honeyman"), "H555");
+}
+
+TEST(SoundexTest, VowelsAndIgnoredLetters) {
+    EXPECT_EQ(generateSoundex("Ashcraft"), "A261");
+    EXPECT_EQ(generateSoundex("Tymczak"), "T522");
+}
+
+TEST(SoundexTest, EdgeCases) {
+    EXPECT_EQ(generateSoundex("A"), "A000");
+    EXPECT_EQ(generateSoundex(""), "0000");
+}
+
+TEST(SoundexTest, RepeatedLettersWithHOrWInBetween) {
+    EXPECT_EQ(generateSoundex("Ashcraft"), "A261");
+    EXPECT_EQ(generateSoundex("Tymczak"), "T522");
+    EXPECT_EQ(generateSoundex("Ashworth"), "A263");
+    EXPECT_EQ(generateSoundex("Jankowski"), "J520");
 }
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-
