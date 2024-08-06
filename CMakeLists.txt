@@ -18,6 +18,7 @@ enable_testing()
 add_compile_options("--coverage")
 add_executable(
   cleancode
+  Soundex.cpp
   Soundex.Tests.cpp
 )
 target_link_libraries(
@@ -25,6 +26,6 @@ target_link_libraries(
   GTest::gmock_main
   gcov
 )
- 
+
 include(GoogleTest)
 gtest_discover_tests(cleancode)
