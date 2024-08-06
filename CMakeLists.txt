@@ -25,6 +25,6 @@ target_link_libraries(
   GTest::gmock_main
   gcov
 )
-
+ 
 include(GoogleTest)
 gtest_discover_tests(cleancode)
