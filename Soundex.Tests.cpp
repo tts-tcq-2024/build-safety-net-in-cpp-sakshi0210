@@ -1,38 +1,47 @@
-#include "Soundex.h"
 #include <gtest/gtest.h>
+#include "Soundex.h"
 
-class SoundexTest : public ::testing::Test {
-protected:
-    Soundex soundex;
-};
-
-TEST_F(SoundexTest, EncodeSingleLetter) {
-    EXPECT_EQ(soundex.encode("A"), "A000");
-    EXPECT_EQ(soundex.encode("B"), "B100");
+TEST(SoundexTest, HandlesEmptyString) {
+    EXPECT_EQ(generateSoundex(""), "0000");
 }
 
-TEST_F(SoundexTest, EncodeSimpleWords) {
-    EXPECT_EQ(soundex.encode("Robert"), "R163");
-    EXPECT_EQ(soundex.encode("Rupert"), "R163");
+TEST(SoundexTest, HandlesSingleCharacter) {
+    EXPECT_EQ(generateSoundex("A"), "A000");
 }
 
-TEST_F(SoundexTest, EncodeComplexWords) {
-    EXPECT_EQ(soundex.encode("Jackson"), "J252");
-    EXPECT_EQ(soundex.encode("Jaxson"), "J252");
+TEST(SoundexTest, BasicFunctionality) {
+    EXPECT_EQ(generateSoundex("Smith"), "S530");
+    EXPECT_EQ(generateSoundex("Smythe"), "S530");
 }
 
-TEST_F(SoundexTest, EncodeEmptyString) {
-    EXPECT_EQ(soundex.encode(""), "0000");
+TEST(SoundexTest, CaseInsensitivity) {
+    EXPECT_EQ(generateSoundex("smith"), "S530");
+    EXPECT_EQ(generateSoundex("SMITH"), "S530");
 }
 
-TEST_F(SoundexTest, HandleMixedCases) {
-    EXPECT_EQ(soundex.encode("RobErT"), "R163");
+TEST(SoundexTest, AdjacentSimilarSoundingConsonants) {
+    EXPECT_EQ(generateSoundex("Pfister"), "P123");
+    EXPECT_EQ(generateSoundex("Honeyman"), "H555");
 }
 
-TEST_F(SoundexTest, HandleSpecialCharacters) {
-    EXPECT_EQ(soundex.encode("Ro@bert"), "R163");
+TEST(SoundexTest, VowelsAndIgnoredLetters) {
+    EXPECT_EQ(generateSoundex("Ashcraft"), "A261");
+    EXPECT_EQ(generateSoundex("Tymczak"), "T522");
 }
 
-TEST_F(SoundexTest, HandleNumbers) {
-    EXPECT_EQ(soundex.encode("123"), "A230");
+TEST(SoundexTest, EdgeCases) {
+    EXPECT_EQ(generateSoundex("A"), "A000");
+    EXPECT_EQ(generateSoundex(""), "0000");
+}
+
+TEST(SoundexTest, RepeatedLettersWithHOrWInBetween) {
+    EXPECT_EQ(generateSoundex("Ashcraft"), "A261");
+    EXPECT_EQ(generateSoundex("Tymczak"), "T522");
+    EXPECT_EQ(generateSoundex("Ashworth"), "A263");
+    EXPECT_EQ(generateSoundex("Jankowski"), "J520");
+}
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
