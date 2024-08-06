@@ -29,4 +29,3 @@ void generateSoundexCode(const char *name, char *soundex) {
     memset(soundex + sIndex, '0', 4 - sIndex);
     soundex[4] = '\0';
 }
-
