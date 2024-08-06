@@ -1,44 +1,40 @@
 #include <gtest/gtest.h>
 #include "Soundex.h"
 
-TEST(SoundexTest, HandlesEmptyString) {
-    EXPECT_EQ(generateSoundex(""), "0000");
+TEST(SoundexTestsuite, ReplacesConsonantsWithAppropriateDigits) {
+    char soundex[5];
+    generateSoundexCode("$rrr", soundex);
+    ASSERT_STREQ(soundex, "$666");
 }
 
-TEST(SoundexTest, HandlesSingleCharacter) {
-    EXPECT_EQ(generateSoundex("A"), "A000");
+TEST(SoundexTestsuite, ReplacesConsonantsWithAppropriateDigits_1) {
+    char soundex[5];
+    generateSoundexCode("pvt", soundex);
+    ASSERT_STREQ(soundex, "P130");
 }
 
-TEST(SoundexTest, BasicFunctionality) {
-    EXPECT_EQ(generateSoundex("Smith"), "S530");
-    EXPECT_EQ(generateSoundex("Smythe"), "S530");
+TEST(SoundexTestsuite, ReplacesConsonantsWithAppropriateDigits_2) {
+    char soundex[5];
+    generateSoundexCode("*#12hi", soundex);
+    ASSERT_STREQ(soundex, "*000");
 }
 
-TEST(SoundexTest, CaseInsensitivity) {
-    EXPECT_EQ(generateSoundex("smith"), "S530");
-    EXPECT_EQ(generateSoundex("SMITH"), "S530");
+TEST(SoundexTestsuite, ReplacesConsonantsWithAppropriateDigits_vowels) {
+    char soundex[5];
+    generateSoundexCode("aeiou", soundex);
+    ASSERT_STREQ(soundex, "A000");
 }
 
-TEST(SoundexTest, AdjacentSimilarSoundingConsonants) {
-    EXPECT_EQ(generateSoundex("Pfister"), "P123");
-    EXPECT_EQ(generateSoundex("Honeyman"), "H555");
+TEST(SoundexTestsuite, ReplacesConsonantsWithAppropriateDigits_space) {
+    char soundex[5];
+    generateSoundexCode(" ", soundex);
+    ASSERT_STREQ(soundex, " 000");
 }
 
-TEST(SoundexTest, VowelsAndIgnoredLetters) {
-    EXPECT_EQ(generateSoundex("Ashcraft"), "A261");
-    EXPECT_EQ(generateSoundex("Tymczak"), "T522");
-}
-
-TEST(SoundexTest, EdgeCases) {
-    EXPECT_EQ(generateSoundex("A"), "A000");
-    EXPECT_EQ(generateSoundex(""), "0000");
-}
-
-TEST(SoundexTest, RepeatedLettersWithHOrWInBetween) {
-    EXPECT_EQ(generateSoundex("Ashcraft"), "A261");
-    EXPECT_EQ(generateSoundex("Tymczak"), "T522");
-    EXPECT_EQ(generateSoundex("Ashworth"), "A263");
-    EXPECT_EQ(generateSoundex("Jankowski"), "J520");
+TEST(SoundexTestsuite, ReplacesConsonantsWithAppropriateDigits_3) {
+    char soundex[5];
+    generateSoundexCode("bcdlmnr", soundex);
+    ASSERT_STREQ(soundex, "B234");
 }
 
 int main(int argc, char **argv) {
