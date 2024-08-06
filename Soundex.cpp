@@ -2,49 +2,50 @@
 #include <cctype>
 #include <unordered_map>
 
-const std::unordered_map<char, char> Soundex::charToDigit = {
-    {'b', '1'}, {'f', '1'}, {'p', '1'}, {'v', '1'},
-    {'c', '2'}, {'g', '2'}, {'j', '2'}, {'k', '2'}, {'q', '2'}, {'s', '2'}, {'x', '2'}, {'z', '2'},
-    {'d', '3'}, {'t', '3'},
-    {'l', '4'},
-    {'m', '5'}, {'n', '5'},
-    {'r', '6'}
-};
+char getSoundexCode(char c) {
+    c = std::toupper(c);
+    switch (c) {
+        case 'B': case 'F': case 'P': case 'V': return '1';
+        case 'C': case 'G': case 'J': case 'K': case 'Q': case 'S': case 'X': case 'Z': return '2';
+        case 'D': case 'T': return '3';
+        case 'L': return '4';
+        case 'M': case 'N': return '5';
+        case 'R': return '6';
+        default: return '0'; // For A, E, I, O, U, H, W, Y
+    }
+}
 
-std::string Soundex::encode(const std::string& word) const {
-    if (word.empty()) return "0000";
+std::string toUpperCase(const std::string& input) {
+    std::string upperCaseStr;
+    upperCaseStr.reserve(input.size());
+    for (char c : input) {
+        upperCaseStr += std::toupper(c);
+    }
+    return upperCaseStr;
+}
 
-    std::string encoding;
-    encoding += std::toupper(word[0]); // Retain the first letter
+std::string constructSoundex(const std::string& name) {
+    std::string soundex(1, name[0]);
+    char prevCode = getSoundexCode(name[0]);
 
-    char prevDigit = '0';
-    for (size_t i = 1; i < word.size(); ++i) {
-        char letter = std::tolower(word[i]);
-        char digit = mapToDigit(letter);
-
-        if (digit != prevDigit && digit != '0') {
-            encoding += digit;
-            prevDigit = digit;
+    for (size_t i = 1; i < name.length() && soundex.length() < 4; ++i) {
+        char code = getSoundexCode(name[i]);
+        if (code != '0' && code != prevCode) {
+            soundex += code;
+            prevCode = code;
         }
     }
 
-    return padToFourCharacters(encoding);
+    while (soundex.length() < 4) {
+        soundex += '0';
+    }
+
+    return soundex;
 }
 
-char Soundex::mapToDigit(char letter) const {
-    auto it = charToDigit.find(letter);
-    return it != charToDigit.end() ? it->second : '0';
-}
+std::string generateSoundex(const std::string& name) {
+    if (name.empty()) return "0000";
 
-std::string Soundex::padToFourCharacters(const std::string& encoding) const {
-    std::string result = encoding.substr(0, 1);
-    for (size_t i = 1; i < encoding.size(); ++i) {
-        if (result.size() < 4) {
-            result += encoding[i];
-        }
-    }
-    while (result.size() < 4) {
-        result += '0';
-    }
-    return result;
+    std::string upperName = toUpperCase(name);
+    return constructSoundex(upperName);
 }
