@@ -1,9 +1,13 @@
 #ifndef SOUNDEX_H
 #define SOUNDEX_H
 
-#include <string>
+#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
 
-std::string generateSoundex(const std::string& name);
 char getSoundexCode(char c);
+int updateSoundexCode(char code, int sIndex, char *soundex);
+void generateSoundexCode(const char *name, char *soundex);
 
 #endif // SOUNDEX_H
+
