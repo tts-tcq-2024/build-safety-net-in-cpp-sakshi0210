@@ -1,51 +1,32 @@
 #include "Soundex.h"
-#include <cctype>
-#include <unordered_map>
 
 char getSoundexCode(char c) {
-    c = std::toupper(c);
-    switch (c) {
-        case 'B': case 'F': case 'P': case 'V': return '1';
-        case 'C': case 'G': case 'J': case 'K': case 'Q': case 'S': case 'X': case 'Z': return '2';
-        case 'D': case 'T': return '3';
-        case 'L': return '4';
-        case 'M': case 'N': return '5';
-        case 'R': return '6';
-        default: return '0'; // For A, E, I, O, U, H, W, Y
+    static const char codeTable[26] = {
+        '0', '1', '2', '3', '0', '1', '2', '0', '0', '2', '2', '4', '5', '5', '0', '1', '2', '6', '2', '3', '0', '1', '0', '2', '0', '2'
+    };
+    c = toupper(c);
+    if (isalpha(c)) {
+        return codeTable[c - 'A'];
     }
+    return '0';
 }
 
-std::string toUpperCase(const std::string& input) {
-    std::string upperCaseStr;
-    upperCaseStr.reserve(input.size());
-    for (char c : input) {
-        upperCaseStr += std::toupper(c);
+int updateSoundexCode(char code, int sIndex, char *soundex) {
+    if (code != '0') {
+        soundex[sIndex] = code;
+        return ++sIndex;
     }
-    return upperCaseStr;
+    return sIndex;
 }
 
-std::string constructSoundex(const std::string& name) {
-    std::string soundex(1, name[0]);
-    char prevCode = getSoundexCode(name[0]);
-
-    for (size_t i = 1; i < name.length() && soundex.length() < 4; ++i) {
+void generateSoundexCode(const char *name, char *soundex) {
+    soundex[0] = toupper(name[0]);
+    int sIndex = 1;
+    for (int i = 1; name[i] != '\0' && sIndex <= 3; i++) {
         char code = getSoundexCode(name[i]);
-        if (code != '0' && code != prevCode) {
-            soundex += code;
-            prevCode = code;
-        }
+        sIndex = updateSoundexCode(code, sIndex, soundex);
     }
-
-    while (soundex.length() < 4) {
-        soundex += '0';
-    }
-
-    return soundex;
+    memset(soundex + sIndex, '0', 4 - sIndex);
+    soundex[4] = '\0';
 }
 
-std::string generateSoundex(const std::string& name) {
-    if (name.empty()) return "0000";
-
-    std::string upperName = toUpperCase(name);
-    return constructSoundex(upperName);
-}
