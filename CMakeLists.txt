@@ -1,24 +1,28 @@
-cmake_minimum_required(VERSION 3.10)
-project(SoundexTest)
+cmake_minimum_required(VERSION 3.11)
+project(Soundex)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Add the executable
-add_executable(testchecker Soundex.cpp SoundexTests.cpp)
+# Include FetchContent module
+include(FetchContent)
 
-# Add Google Test
+# Fetch GoogleTest
 FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/release-1.11.0.zip
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip
 )
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
+# FetchContent_MakeAvailable is available since CMake 3.14
 FetchContent_MakeAvailable(googletest)
-
-# Link Google Test to the executable
-target_link_libraries(testchecker gtest_main)
 
 enable_testing()
 
-add_test(NAME SoundexTest COMMAND testchecker)
+# Add the main executable
+add_executable(SoundexTests Soundex.cpp SoundexTests.cpp)
+
+# Link GoogleTest to the executable
+target_link_libraries(SoundexTests gtest gtest_main)
+
+# Add test
+add_test(NAME SoundexTests COMMAND SoundexTests)
+
