@@ -2,19 +2,8 @@
 #define SOUNDEX_H
 
 #include <string>
-#include <unordered_map>
 
-class Soundex {
-public:
-    std::string encode(const std::string& word) const;
-
-private:
-    char mapToDigit(char letter) const;
-    std::string padToFourCharacters(const std::string& encoding) const;
-
-    static const std::unordered_map<char, char> charToDigit;
-};
+std::string generateSoundex(const std::string& name);
+char getSoundexCode(char c);
 
 #endif // SOUNDEX_H
-
-
