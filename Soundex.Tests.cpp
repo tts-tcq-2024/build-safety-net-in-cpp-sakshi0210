@@ -1,39 +1,47 @@
 #include <gtest/gtest.h>
 #include "Soundex.h"
-TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits) {
-//AAA
-  char soundex[5];
-generateSoundex("$rrr", soundex);
-ASSERT_STREQ(soundex,"$666");
+
+TEST(SoundexTest, HandlesEmptyString) {
+    EXPECT_EQ(generateSoundex(""), "");
 }
-TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_1) {
-//AAA
-char soundex[5];
-generateSoundex("pvt", soundex);
-ASSERT_STREQ(soundex,"P130");
+
+TEST(SoundexTest, HandlesSingleCharacter) {
+    EXPECT_EQ(generateSoundex("A"), "A000");
 }
-TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_2) {
-//AAA
-  char soundex[5];
-generateSoundex("*#12hi", soundex);
-ASSERT_STREQ(soundex,"*000");
+
+TEST(SoundexTest, HandlesSimpleCases) {
+    EXPECT_EQ(generateSoundex("Robert"), "R163");
+    EXPECT_EQ(generateSoundex("Rupert"), "R163");
+    EXPECT_EQ(generateSoundex("Rubin"), "R150");
+    EXPECT_EQ(generateSoundex("Ashcraft"), "A261");
+    EXPECT_EQ(generateSoundex("Ashcroft"), "A261");
+    EXPECT_EQ(generateSoundex("Tymczak"), "T520");
+    EXPECT_EQ(generateSoundex("Pfister"), "P236");
 }
-TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_vowels) {
-//AAA
-char soundex[5];
-generateSoundex("aeiou", soundex);
-ASSERT_STREQ(soundex,"A000");
+
+TEST(SoundexTest, HandlesNameWithDuplicates) {
+    EXPECT_EQ(generateSoundex("Aardvark"), "A631");
+    EXPECT_EQ(generateSoundex("Bookkeeper"), "B216");
 }
- 
-TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_space) {
-//AAA
-char soundex[5];
-generateSoundex(" ", soundex);
-ASSERT_STREQ(soundex," 000");
+
+TEST(SoundexTest, HandlesNameWithAllVowels) {
+    EXPECT_EQ(generateSoundex("Aeiou"), "A000");
+    EXPECT_EQ(generateSoundex("AeIouyHw"), "A000"); 
 }
-TEST(SoudexTestsuite, ReplacesConsonantsWithAppropriateDigits_3) {
-//AAA
-char soundex[5];
-generateSoundex("bcdlmnr", soundex);
-ASSERT_STREQ(soundex,"B234");
+
+TEST(SoundexTest, HandlesNameWithMixedCases) {
+    EXPECT_EQ(generateSoundex("roBErt"), "R163");
+    EXPECT_EQ(generateSoundex("RuPErt"), "R163");
+}
+
+TEST(SoundexTest, HandlesNamesThatMapToSameCode) {
+    EXPECT_EQ(generateSoundex("Robert"), generateSoundex("Rupert"));
+    EXPECT_EQ(generateSoundex("Ashcraft"), generateSoundex("Ashcroft"));
+}
+
+TEST(SoundexTest, HandlesNameThatRequiresPadding) {
+    EXPECT_EQ(generateSoundex("A"), "A000");
+    EXPECT_EQ(generateSoundex("R"), "R000");
+    EXPECT_EQ(generateSoundex("Ra"), "R000");
+    EXPECT_EQ(generateSoundex("Ray"), "R000");
 }
